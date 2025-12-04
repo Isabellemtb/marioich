@@ -23,9 +23,9 @@
 
         <!-- Langue -->
         <div class="mb-3">
-            <label for="language_id" class="form-label">Langue</label>
+            <label for="language_id" class="form-label">ID Langue</label>
             <input type="number" class="form-control" id="language_id" name="language_id"
-             value="{{ old('language_id', $film['languageId'] ?? '') }}">
+                   value="{{ old('language_id', $film['originalLanguageId'] ?? '') }}">
         </div>
 
 

@@ -22,4 +22,12 @@ Route::middleware('auth')->group(function () {
     Route::put('/films/{id}', [FilmController::class, 'update'])->name('films.update');
     Route::delete('/films/{id}', [FilmController::class, 'destroy'])->name('films.destroy');
 
+    // Routes pour la gestion du stock
+    Route::get('/inventory', [App\Http\Controllers\InventoryController::class, 'index'])->name('inventory.index');
+    Route::get('/inventory/{storeId}', [App\Http\Controllers\InventoryController::class, 'show'])->name('inventory.show');
+    Route::get('/inventory/{storeId}/create', [App\Http\Controllers\InventoryController::class, 'create'])->name('inventory.create');
+    Route::post('/inventory/{storeId}', [App\Http\Controllers\InventoryController::class, 'store'])->name('inventory.store');
+    Route::get('/inventory/{storeId}/film/{filmId}', [App\Http\Controllers\InventoryController::class, 'detail'])->name('inventory.detail');
+    Route::get('/inventory/{storeId}/film/{filmId}/edit', [App\Http\Controllers\InventoryController::class, 'edit'])->name('inventory.edit');
+    Route::put('/inventory/{storeId}/film/{filmId}', [App\Http\Controllers\InventoryController::class, 'update'])->name('inventory.update');
 });

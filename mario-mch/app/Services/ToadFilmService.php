@@ -21,14 +21,12 @@ class ToadFilmService
 
         try {
             $headers = ['Accept' => 'application/json'];
-            
+
             // Récupère le token JWT depuis la session
             $token = $this->getUserToken();
             if ($token) {
                 $headers['Authorization'] = "Bearer {$token}";
             }
-
-            Log::info('Appel API Films', ['url' => $url, 'has_token' => !empty($token)]);
 
             $response = Http::withHeaders($headers)
                 ->timeout(10)
@@ -38,7 +36,6 @@ class ToadFilmService
                 return $response->json();
             }
 
-            Log::warning('Films API KO', ['status' => $response->status(), 'body' => $response->body()]);
             return null;
         } catch (\Throwable $e) {
             Log::error('Erreur API Films', ['msg' => $e->getMessage()]);
@@ -78,8 +75,6 @@ class ToadFilmService
     private function getUserToken(): ?string
     {
         $userData = session('toad_user');
-        Log::info('Récupération token utilisateur', ['userData' => $userData]);
-
         return $userData['token'] ?? null;
     }
     /**
@@ -89,74 +84,92 @@ class ToadFilmService
     {
         $url = $this->baseUrl . '/films/' . $id;
 
-    try {
-        $headers = ['Accept' => 'application/json'];
-        $token = $this->getUserToken();
-        if ($token) {
-            $headers['Authorization'] = "Bearer {$token}";
+        try {
+            $headers = [
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json'
+            ];
+            $token = $this->getUserToken();
+            if ($token) {
+                $headers['Authorization'] = "Bearer {$token}";
+            }
+
+            Log::info('Tentative mise à jour film', ['url' => $url, 'data' => $data]);
+
+            $response = Http::withHeaders($headers)
+                ->timeout(10)
+                ->put($url, $data);
+
+            if ($response->successful()) {
+                Log::info('Mise à jour film OK', ['id' => $id]);
+                return true;
+            }
+
+            Log::warning('Mise à jour film KO', ['status' => $response->status(), 'body' => $response->body()]);
+            return false;
+
+        } catch (\Throwable $e) {
+            Log::error('Erreur mise à jour film', ['msg' => $e->getMessage()]);
+            return false;
         }
-
-        $response = Http::withHeaders($headers)
-            ->timeout(10)
-            ->put($url, $data);
-
-        if ($response->successful()) {
-            return true;
-        }
-
-        Log::warning('Mise à jour film KO', ['status' => $response->status(), 'body' => $response->body()]);
-        return false;
-
-    } catch (\Throwable $e) {
-        Log::error('Erreur mise à jour film', ['msg' => $e->getMessage()]);
-        return false;
     }
-}
     public function createFilm(array $data): bool
-{
+    {
         $url = $this->baseUrl . '/films';
 
-    try {
-        $headers = ['Accept' => 'application/json'];
-        $token = $this->getUserToken();
-        if ($token) {
-            $headers['Authorization'] = "Bearer {$token}";
-        }
+        try {
+            $headers = [
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json'
+            ];
+            $token = $this->getUserToken();
+            if ($token) {
+                $headers['Authorization'] = "Bearer {$token}";
+            }
 
-        $response = Http::withHeaders($headers)
-            ->timeout(10)
-            ->post($url, $data);
+            Log::info('Tentative création film', ['url' => $url, 'data' => $data]);
 
-        return $response->successful();
+            $response = Http::withHeaders($headers)
+                ->timeout(10)
+                ->post($url, $data);
 
-    } catch (\Throwable $e) {
-        Log::error('Erreur création film', ['msg' => $e->getMessage()]);
-        return false;
+            if ($response->successful()) {
+                Log::info('Création film OK');
+                return true;
+            }
+
+            Log::warning('Création film KO', ['status' => $response->status(), 'body' => $response->body()]);
+            return false;
+
+        } catch (\Throwable $e) {
+            Log::error('Erreur création film', ['msg' => $e->getMessage()]);
+            return false;
         }
     }
     public function deleteFilm($id): bool
-{
-    $url = $this->baseUrl . '/films/' . $id;
+    {
+        $url = $this->baseUrl . '/films/' . $id;
 
-    try {
-        $headers = ['Accept' => 'application/json'];
-        $token = $this->getUserToken();
-        if ($token) {
-            $headers['Authorization'] = "Bearer {$token}";
-        }
+        try {
+            $headers = ['Accept' => 'application/json'];
+            $token = $this->getUserToken();
+            if ($token) {
+                $headers['Authorization'] = "Bearer {$token}";
+            }
 
-        $response = Http::withHeaders($headers)
+            $response = Http::withHeaders($headers)
                 ->withOptions(['verify' => false])
                 ->delete($url);
 
+            if ($response->successful()) {
+                return true;
+            }
 
-
-
-        return $response->successful();
-    } catch (\Throwable $e) {
-        Log::error('Erreur suppression film', ['msg' => $e->getMessage()]);
-        return false;
+            return false;
+        } catch (\Throwable $e) {
+            Log::error('Erreur suppression film', ['msg' => $e->getMessage()]);
+            return false;
+        }
     }
-}
 
 }

@@ -64,14 +64,24 @@ public function update(Request $request, $id)
     $validated = $request->validate([
         'title' => 'required|string|max:255',
         'description' => 'nullable|string',
-        'language' => 'required|string|max:50',
+        'language_id' => 'nullable|integer',
         'release_year' => 'required|integer',
         'length' => 'nullable|integer',
         'rating' => 'nullable|string|max:10',
     ]);
 
+    // Transformer pour l'API (camelCase) avec types corrects
+    $data = [
+        'title' => $validated['title'],
+        'description' => $validated['description'],
+        'originalLanguageId' => $validated['language_id'] ? (int)$validated['language_id'] : null,
+        'releaseYear' => (int)$validated['release_year'],
+        'length' => $validated['length'] ? (int)$validated['length'] : null,
+        'rating' => $validated['rating'],
+    ];
+
     // Appelle le service pour mettre à jour le film
-    $updated = $this->filmService->updateFilm($id, $validated);
+    $updated = $this->filmService->updateFilm($id, $data);
 
     // Si la mise à jour échoue
     if (!$updated) {
@@ -87,18 +97,19 @@ public function store(Request $request)
     $validated = $request->validate([
         'title' => 'required|string|max:255',
         'description' => 'nullable|string',
-        'language' => 'required|string|max:50',
+        'language_id' => 'nullable|integer',
         'release_year' => 'required|integer',
         'length' => 'nullable|integer',
         'rating' => 'nullable|string|max:10',
     ]);
 
-    // Transformer pour l'API (camelCase)
+    // Transformer pour l'API (camelCase) avec types corrects
     $data = [
         'title' => $validated['title'],
         'description' => $validated['description'],
-        'releaseYear' => $validated['release_year'],
-        'length' => $validated['length'],
+        'originalLanguageId' => $validated['language_id'] ? (int)$validated['language_id'] : null,
+        'releaseYear' => (int)$validated['release_year'],
+        'length' => $validated['length'] ? (int)$validated['length'] : null,
         'rating' => $validated['rating'],
     ];
 
