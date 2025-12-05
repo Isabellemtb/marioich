@@ -51,6 +51,40 @@
                         </div>
                     </div>
 
+                    <hr>
+
+                    <div class="mb-3">
+                        <h6 class="fw-bold">Liste des exemplaires individuels</h6>
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID Inventaire</th>
+                                        <th>Statut</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($dvdList as $dvd)
+                                        <tr>
+                                            <td>#{{ $dvd['inventory_id'] }}</td>
+                                            <td>
+                                                @if($dvd['is_available'])
+                                                    <span class="badge bg-success">Disponible</span>
+                                                @else
+                                                    <span class="badge bg-warning">En location</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="2" class="text-center text-muted">Aucun exemplaire</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
                     <div class="alert alert-info">
                         <i class="bi bi-info-circle"></i>
                         Pour modifier la quantité d'exemplaires, cliquez sur le bouton "Modifier" ci-dessus.

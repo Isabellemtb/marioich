@@ -45,16 +45,14 @@
 
                             <div class="col-md-6 mb-3">
                                 <label for="disponibilite" class="form-label">Disponibilité</label>
-                                <select class="form-select @error('disponibilite') is-invalid @enderror"
-                                        id="disponibilite"
-                                        name="disponibilite">
-                                    <option value="disponible">Disponible</option>
-                                    <option value="loue">Loué</option>
-                                    <option value="maintenance">En maintenance</option>
-                                </select>
-                                @error('disponibilite')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                                <input type="text"
+                                       class="form-control"
+                                       id="disponibilite"
+                                       value="Disponible"
+                                       readonly>
+                                <small class="form-text text-muted">
+                                    Les nouveaux DVDs sont automatiquement disponibles
+                                </small>
                             </div>
                         </div>
 

@@ -30,4 +30,5 @@ Route::middleware('auth')->group(function () {
     Route::get('/inventory/{storeId}/film/{filmId}', [App\Http\Controllers\InventoryController::class, 'detail'])->name('inventory.detail');
     Route::get('/inventory/{storeId}/film/{filmId}/edit', [App\Http\Controllers\InventoryController::class, 'edit'])->name('inventory.edit');
     Route::put('/inventory/{storeId}/film/{filmId}', [App\Http\Controllers\InventoryController::class, 'update'])->name('inventory.update');
+    Route::delete('/inventory/{storeId}/film/{filmId}/item/{inventoryId}', [App\Http\Controllers\InventoryController::class, 'deleteItem'])->name('inventory.delete-item');
 });

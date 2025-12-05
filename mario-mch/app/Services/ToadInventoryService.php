@@ -130,6 +130,36 @@ class ToadInventoryService
     }
 
     /**
+     * Vérifie si un DVD est disponible (non loué)
+     */
+    public function checkIfDVDIsAvailable(int $inventoryId): bool
+    {
+        $url = $this->baseUrl . '/inventories/checkIfDVDIsAvailable/' . $inventoryId;
+
+        try {
+            $headers = ['Accept' => 'application/json'];
+
+            $token = $this->getUserToken();
+            if ($token) {
+                $headers['Authorization'] = "Bearer {$token}";
+            }
+
+            $response = Http::withHeaders($headers)
+                ->timeout(10)
+                ->get($url);
+
+            if ($response->successful()) {
+                return (bool) $response->json();
+            }
+
+            return false;
+        } catch (\Throwable $e) {
+            Log::error('Erreur vérification disponibilité DVD', ['msg' => $e->getMessage()]);
+            return false;
+        }
+    }
+
+    /**
      * Récupère le token JWT depuis la session utilisateur
      */
     private function getUserToken(): ?string

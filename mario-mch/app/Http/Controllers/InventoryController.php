@@ -22,7 +22,7 @@ class InventoryController extends Controller
         // Récupère tous les inventaires depuis l'API
         $inventories = $this->inventoryService->getAllInventories();
 
-        // Groupe les inventaires par magasin
+        // Groupe les inventaires par store
         $storeGroups = [];
         if ($inventories) {
             foreach ($inventories as $inventory) {
@@ -49,7 +49,7 @@ class InventoryController extends Controller
 
     public function show($storeId)
     {
-        // Récupère les inventaires pour ce magasin
+        // Récupère les inventaires pour ce store
         $inventories = $this->inventoryService->getInventoriesByStore($storeId);
 
         // Transforme pour la vue
@@ -112,16 +112,22 @@ class InventoryController extends Controller
         $inventories = $this->inventoryService->getInventoriesByStore($storeId);
 
         $filmTitle = null;
-        $availableCount = 0;
-        $unavailableCount = 0;
+        $dvdList = [];
 
         if ($inventories) {
             foreach ($inventories as $inventory) {
                 if (($inventory['filmId'] ?? null) == $filmId) {
                     $filmTitle = $inventory['film']['title'] ?? 'N/A';
-                    // TODO: Vérifier le statut de disponibilité dans l'API
-                    // Pour l'instant, on considère que tous sont disponibles
-                    $availableCount++;
+
+                    // Vérifie le statut de disponibilité via l'API
+                    $inventoryId = $inventory['inventoryId'] ?? null;
+                    if ($inventoryId) {
+                        $isAvailable = $this->inventoryService->checkIfDVDIsAvailable($inventoryId);
+                        $dvdList[] = [
+                            'inventory_id' => $inventoryId,
+                            'is_available' => $isAvailable
+                        ];
+                    }
                 }
             }
         }
@@ -130,9 +136,10 @@ class InventoryController extends Controller
             'storeId' => $storeId,
             'filmId' => $filmId,
             'filmTitle' => $filmTitle,
-            'availableCount' => $availableCount,
-            'unavailableCount' => $unavailableCount,
-            'totalCount' => $availableCount + $unavailableCount
+            'dvdList' => $dvdList,
+            'availableCount' => count(array_filter($dvdList, fn($dvd) => $dvd['is_available'])),
+            'unavailableCount' => count(array_filter($dvdList, fn($dvd) => !$dvd['is_available'])),
+            'totalCount' => count($dvdList)
         ]);
     }
 
@@ -174,17 +181,22 @@ class InventoryController extends Controller
         $inventories = $this->inventoryService->getInventoriesByStore($storeId);
 
         $filmTitle = null;
-        $availableCount = 0;
-        $unavailableCount = 0;
+        $dvdList = [];
 
         if ($inventories) {
             foreach ($inventories as $inventory) {
                 if (($inventory['filmId'] ?? null) == $filmId) {
                     $filmTitle = $inventory['film']['title'] ?? 'N/A';
 
-                    // TODO: Vérifier le statut de disponibilité dans l'API
-                    // Pour l'instant, on considère que tous sont disponibles
-                    $availableCount++;
+                    // Vérifie le statut de disponibilité via l'API
+                    $inventoryId = $inventory['inventoryId'] ?? null;
+                    if ($inventoryId) {
+                        $isAvailable = $this->inventoryService->checkIfDVDIsAvailable($inventoryId);
+                        $dvdList[] = [
+                            'inventory_id' => $inventoryId,
+                            'is_available' => $isAvailable
+                        ];
+                    }
                 }
             }
         }
@@ -193,8 +205,9 @@ class InventoryController extends Controller
             'storeId' => $storeId,
             'filmId' => $filmId,
             'filmTitle' => $filmTitle,
-            'availableCount' => $availableCount,
-            'unavailableCount' => $unavailableCount
+            'dvdList' => $dvdList,
+            'availableCount' => count(array_filter($dvdList, fn($dvd) => $dvd['is_available'])),
+            'unavailableCount' => count(array_filter($dvdList, fn($dvd) => !$dvd['is_available']))
         ]);
     }
 
@@ -215,9 +228,11 @@ class InventoryController extends Controller
         if ($inventories) {
             foreach ($inventories as $inventory) {
                 if (($inventory['filmId'] ?? null) == $filmId) {
-                    // TODO: Vérifier le statut de disponibilité
-                    // Pour l'instant, on considère tous comme disponibles
-                    $availableInventories[] = $inventory;
+                    // Vérifie le statut de disponibilité via l'API
+                    $inventoryId = $inventory['inventoryId'] ?? null;
+                    if ($inventoryId && $this->inventoryService->checkIfDVDIsAvailable($inventoryId)) {
+                        $availableInventories[] = $inventory;
+                    }
                 }
             }
         }
@@ -245,5 +260,23 @@ class InventoryController extends Controller
 
         return redirect()->route('inventory.show', $storeId)
             ->with('success', 'Stock mis à jour avec succès !');
+    }
+
+    public function deleteItem($storeId, $filmId, $inventoryId)
+    {
+        // Vérifie que le DVD est disponible avant de le supprimer
+        $isAvailable = $this->inventoryService->checkIfDVDIsAvailable($inventoryId);
+
+        if (!$isAvailable) {
+            return redirect()->back()->with('error', 'Impossible de supprimer un DVD en location.');
+        }
+
+        // Supprime le DVD
+        if ($this->inventoryService->deleteInventory($inventoryId)) {
+            return redirect()->route('inventory.edit', [$storeId, $filmId])
+                ->with('success', 'DVD supprimé avec succès !');
+        }
+
+        return redirect()->back()->with('error', 'Erreur lors de la suppression du DVD.');
     }
 }

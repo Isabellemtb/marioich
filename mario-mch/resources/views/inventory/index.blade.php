@@ -6,14 +6,14 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="mb-0">Liste des magasins</h5>
+                    <h5 class="mb-0">Liste des Store</h5>
                 </div>
 
                 <div class="card-body">
                     @if ($stores->isEmpty())
                         <div class="alert alert-warning">
                             <i class="bi bi-exclamation-triangle"></i>
-                            Aucun magasin disponible.
+                            Aucun Store disponible.
                         </div>
                     @else
                         <div class="table-responsive">

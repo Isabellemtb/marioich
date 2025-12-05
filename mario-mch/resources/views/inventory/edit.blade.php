@@ -54,47 +54,86 @@
 
                         <hr>
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="to_add" class="form-label">Quantité à ajouter</label>
-                                <input type="number"
-                                       class="form-control @error('to_add') is-invalid @enderror"
-                                       id="to_add"
-                                       name="to_add"
-                                       min="0"
-                                       value="0">
-                                @error('to_add')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label for="to_remove" class="form-label">Quantité à supprimer (disponibles uniquement)</label>
-                                <input type="number"
-                                       class="form-control @error('to_remove') is-invalid @enderror"
-                                       id="to_remove"
-                                       name="to_remove"
-                                       min="0"
-                                       max="{{ $availableCount }}"
-                                       value="0">
-                                @error('to_remove')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                                <small class="form-text text-muted">
-                                    Maximum : {{ $availableCount }}
-                                </small>
-                            </div>
+                        <div class="mb-3">
+                            <label for="to_add" class="form-label">Quantité à ajouter</label>
+                            <input type="number"
+                                   class="form-control @error('to_add') is-invalid @enderror"
+                                   id="to_add"
+                                   name="to_add"
+                                   min="0"
+                                   value="0">
+                            @error('to_add')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
+
+                        <!-- Champ caché pour to_remove (la suppression se fait individuellement) -->
+                        <input type="hidden" name="to_remove" value="0">
 
                         <div class="d-flex justify-content-between mt-4">
                             <a href="{{ route('inventory.show', $storeId) }}" class="btn btn-secondary">
                                 <i class="bi bi-arrow-left"></i> Retour
                             </a>
                             <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-check-circle"></i> Modifier
+                                <i class="bi bi-plus-circle"></i> Ajouter
                             </button>
                         </div>
                     </form>
+
+                    <hr class="my-4">
+
+                    <h6 class="fw-bold mb-3">Gestion des exemplaires individuels</h6>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID Inventaire</th>
+                                    <th>Statut</th>
+                                    <th width="120">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($dvdList as $dvd)
+                                    <tr>
+                                        <td>#{{ $dvd['inventory_id'] }}</td>
+                                        <td>
+                                            @if($dvd['is_available'])
+                                                <span class="badge bg-success">Disponible</span>
+                                            @else
+                                                <span class="badge bg-warning">En location</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($dvd['is_available'])
+                                                <form action="{{ route('inventory.delete-item', [$storeId, $filmId, $dvd['inventory_id']]) }}"
+                                                      method="POST"
+                                                      onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet exemplaire ?');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-danger btn-sm">
+                                                        <i class="bi bi-trash"></i> Supprimer
+                                                    </button>
+                                                </form>
+                                            @else
+                                                <button class="btn btn-secondary btn-sm" disabled>
+                                                    <i class="bi bi-lock"></i> En location
+                                                </button>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="3" class="text-center text-muted">Aucun exemplaire</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="alert alert-info mt-3">
+                        <i class="bi bi-info-circle"></i>
+                        Vous ne pouvez supprimer que les exemplaires <strong>disponibles</strong>. Les DVDs en location sont protégés.
+                    </div>
                 </div>
             </div>
         </div>
