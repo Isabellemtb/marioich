@@ -35,19 +35,52 @@
                         <dd class="col-sm-9">{{ $film['releaseYear'] ?? 'N/A' }}</dd>
 
                         <dt class="col-sm-3">Langue</dt>
-                        <dd class="col-sm-9">ID {{ $film['languageId'] ?? 'N/A' }}</dd>
+                        <dd class="col-sm-9">{{ $film['languageName'] ?? 'N/A' }}</dd>
 
                         <dt class="col-sm-3">Durée</dt>
                         <dd class="col-sm-9">{{ $film['length'] ?? 'N/A' }} minutes</dd>
 
-                        <dt class="col-sm-3">Coût de remplacement</dt>
-                        <dd class="col-sm-9">{{ $film['replacementCost'] ?? 'N/A' }} €</dd>
-
-                        <dt class="col-sm-3">Note</dt>
-                        <dd class="col-sm-9">{{ $film['rating'] ?? 'N/A' }}</dd>
-
                         <dt class="col-sm-3">Caractéristiques spéciales</dt>
                         <dd class="col-sm-9">{{ $film['specialFeatures'] ?? 'Aucune' }}</dd>
+
+                        <dt class="col-sm-3">Réalisateurs</dt>
+                        <dd class="col-sm-9">
+                            @if(isset($film['directors']) && count($film['directors']) > 0)
+                                @foreach($film['directors'] as $director)
+                                    <span class="badge bg-primary me-1 mb-1">
+                                        <i class="bi bi-person-badge"></i> {{ $director['firstName'] }} {{ $director['lastName'] }}
+                                    </span>
+                                @endforeach
+                            @else
+                                <span class="text-muted">Aucun réalisateur</span>
+                            @endif
+                        </dd>
+
+                        <dt class="col-sm-3">Acteurs</dt>
+                        <dd class="col-sm-9">
+                            @if(isset($film['actors']) && count($film['actors']) > 0)
+                                @foreach($film['actors'] as $actor)
+                                    <span class="badge bg-success me-1 mb-1">
+                                        <i class="bi bi-person"></i> {{ $actor['firstName'] }} {{ $actor['lastName'] }}
+                                    </span>
+                                @endforeach
+                            @else
+                                <span class="text-muted">Aucun acteur</span>
+                            @endif
+                        </dd>
+
+                        <dt class="col-sm-3">Catégories</dt>
+                        <dd class="col-sm-9">
+                            @if(isset($film['categories']) && count($film['categories']) > 0)
+                                @foreach($film['categories'] as $category)
+                                    <span class="badge bg-warning text-dark me-1 mb-1">
+                                        <i class="bi bi-tag"></i> {{ $category['name'] ?? $category }}
+                                    </span>
+                                @endforeach
+                            @else
+                                <span class="text-muted">Aucune catégorie</span>
+                            @endif
+                        </dd>
 
                     </dl>
 

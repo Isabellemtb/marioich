@@ -3,9 +3,10 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\FilmController;
+use App\Http\Controllers\AdminController;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 });
 
 Auth::routes();
@@ -30,5 +31,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/inventory/{storeId}/film/{filmId}', [App\Http\Controllers\InventoryController::class, 'detail'])->name('inventory.detail');
     Route::get('/inventory/{storeId}/film/{filmId}/edit', [App\Http\Controllers\InventoryController::class, 'edit'])->name('inventory.edit');
     Route::put('/inventory/{storeId}/film/{filmId}', [App\Http\Controllers\InventoryController::class, 'update'])->name('inventory.update');
+    Route::post('/inventory/{storeId}/film/{filmId}/transfer', [App\Http\Controllers\InventoryController::class, 'transfer'])->name('inventory.transfer');
     Route::delete('/inventory/{storeId}/film/{filmId}/item/{inventoryId}', [App\Http\Controllers\InventoryController::class, 'deleteItem'])->name('inventory.delete-item');
+
+    // Routes pour la gestion des comptes bloqués
+    Route::get('/admin/comptes-bloques', [AdminController::class, 'index'])->name('admin.locked-accounts');
+    Route::get('/api/admin/locked-accounts', [AdminController::class, 'getLockedAccounts']);
+    Route::post('/api/admin/unlock/{id}', [AdminController::class, 'unlockAccount']);
 });

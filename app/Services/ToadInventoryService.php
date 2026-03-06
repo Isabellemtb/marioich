@@ -28,7 +28,7 @@ class ToadInventoryService
             }
 
             $response = Http::withHeaders($headers)
-                ->timeout(10)
+                ->timeout(60)
                 ->get($url);
 
             if ($response->successful()) {
@@ -55,7 +55,7 @@ class ToadInventoryService
             }
 
             $response = Http::withHeaders($headers)
-                ->timeout(10)
+                ->timeout(60)
                 ->get($url);
 
             if ($response->successful()) {
@@ -93,7 +93,7 @@ class ToadInventoryService
             }
 
             $response = Http::withHeaders($headers)
-                ->timeout(10)
+                ->timeout(60)
                 ->post($url, $data);
 
             return $response->successful();
@@ -119,7 +119,7 @@ class ToadInventoryService
             }
 
             $response = Http::withHeaders($headers)
-                ->timeout(10)
+                ->timeout(60)
                 ->delete($url);
 
             return $response->successful();
@@ -145,7 +145,7 @@ class ToadInventoryService
             }
 
             $response = Http::withHeaders($headers)
-                ->timeout(10)
+                ->timeout(60)
                 ->get($url);
 
             if ($response->successful()) {
@@ -155,6 +155,35 @@ class ToadInventoryService
             return false;
         } catch (\Throwable $e) {
             Log::error('Erreur vérification disponibilité DVD', ['msg' => $e->getMessage()]);
+            return false;
+        }
+    }
+
+    /**
+     * Met à jour un inventaire pour changer le store
+     */
+    public function updateInventory(int $inventoryId, array $data): bool
+    {
+        $url = $this->baseUrl . '/inventories/' . $inventoryId;
+
+        try {
+            $headers = [
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+            ];
+
+            $token = $this->getUserToken();
+            if ($token) {
+                $headers['Authorization'] = "Bearer {$token}";
+            }
+
+            $response = Http::withHeaders($headers)
+                ->timeout(60)
+                ->put($url, $data);
+
+            return $response->successful();
+        } catch (\Throwable $e) {
+            Log::error('Erreur mise à jour inventaire', ['msg' => $e->getMessage()]);
             return false;
         }
     }

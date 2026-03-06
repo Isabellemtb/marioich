@@ -201,13 +201,27 @@ class InventoryController extends Controller
             }
         }
 
+        // Récupère tous les stores disponibles pour le transfert (sauf le store actuel)
+        $allInventories = $this->inventoryService->getAllInventories();
+        $allStores = [];
+        if ($allInventories) {
+            foreach ($allInventories as $inventory) {
+                $store = $inventory['storeId'] ?? null;
+                if ($store && $store != $storeId && !in_array($store, $allStores)) {
+                    $allStores[] = $store;
+                }
+            }
+        }
+        sort($allStores);
+
         return view('inventory.edit', [
             'storeId' => $storeId,
             'filmId' => $filmId,
             'filmTitle' => $filmTitle,
             'dvdList' => $dvdList,
             'availableCount' => count(array_filter($dvdList, fn($dvd) => $dvd['is_available'])),
-            'unavailableCount' => count(array_filter($dvdList, fn($dvd) => !$dvd['is_available']))
+            'unavailableCount' => count(array_filter($dvdList, fn($dvd) => !$dvd['is_available'])),
+            'allStores' => $allStores
         ]);
     }
 
@@ -278,5 +292,67 @@ class InventoryController extends Controller
         }
 
         return redirect()->back()->with('error', 'Erreur lors de la suppression du DVD.');
+    }
+
+    /**
+     * Traite le transfert de DVD vers un autre store
+     */
+    public function transfer($storeId, $filmId)
+    {
+        $validated = request()->validate([
+            'target_store_id' => 'required|integer',
+            'quantity' => 'required|integer|min:1',
+        ]);
+
+        $targetStoreId = (int)$validated['target_store_id'];
+        $quantity = (int)$validated['quantity'];
+
+        // Vérifie que le store cible est différent
+        if ($targetStoreId == $storeId) {
+            return redirect()->back()->with('error', 'Le store de destination doit être différent du store actuel.');
+        }
+
+        // Récupère les DVD disponibles pour ce film dans ce store
+        $inventories = $this->inventoryService->getInventoriesByStore($storeId);
+        $availableDvds = [];
+
+        if ($inventories) {
+            foreach ($inventories as $inventory) {
+                if (($inventory['filmId'] ?? null) == $filmId) {
+                    $inventoryId = $inventory['inventoryId'] ?? null;
+                    if ($inventoryId && $this->inventoryService->checkIfDVDIsAvailable($inventoryId)) {
+                        $availableDvds[] = $inventory;
+                    }
+                }
+            }
+        }
+
+        // Vérifie qu'on a assez de DVD disponibles
+        if ($quantity > count($availableDvds)) {
+            return redirect()->back()->with('error', 'Pas assez de DVD disponibles pour le transfert.');
+        }
+
+        // Transfère les DVD en mettant à jour leur storeId
+        $transferred = 0;
+        for ($i = 0; $i < $quantity; $i++) {
+            $inventoryId = $availableDvds[$i]['inventoryId'] ?? null;
+            if ($inventoryId) {
+                $data = [
+                    'filmId' => (int)$filmId,
+                    'storeId' => $targetStoreId,
+                ];
+
+                if ($this->inventoryService->updateInventory($inventoryId, $data)) {
+                    $transferred++;
+                }
+            }
+        }
+
+        if ($transferred == $quantity) {
+            return redirect()->route('inventory.edit', [$storeId, $filmId])
+                ->with('success', "$transferred DVD(s) transféré(s) vers le Store $targetStoreId avec succès !");
+        }
+
+        return redirect()->back()->with('error', 'Erreur lors du transfert des DVD.');
     }
 }

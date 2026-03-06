@@ -68,6 +68,9 @@ public function update(Request $request, $id)
         'release_year' => 'required|integer',
         'length' => 'nullable|integer',
         'rating' => 'nullable|string|max:10',
+        'rental_duration' => 'required|integer',
+        'rental_rate' => 'required|numeric',
+        'replacement_cost' => 'required|numeric',
     ]);
 
     // Transformer pour l'API (camelCase) avec types corrects
@@ -78,6 +81,9 @@ public function update(Request $request, $id)
         'releaseYear' => (int)$validated['release_year'],
         'length' => $validated['length'] ? (int)$validated['length'] : null,
         'rating' => $validated['rating'],
+        'rentalDuration' => (int)$validated['rental_duration'],
+        'rentalRate' => (float)$validated['rental_rate'],
+        'replacementCost' => (float)$validated['replacement_cost'],
     ];
 
     // Appelle le service pour mettre à jour le film
@@ -111,9 +117,12 @@ public function store(Request $request)
         'releaseYear' => (int)$validated['release_year'],
         'length' => $validated['length'] ? (int)$validated['length'] : null,
         'rating' => $validated['rating'],
+        'rentalDuration' => 3,
+        'rentalRate' => 4.99,
+        'replacementCost' => 19.99,
     ];
 
-    $created = $this->filmService->createFilm($data); 
+    $created = $this->filmService->createFilm($data);
 
     if (!$created) {
         return redirect()->back()->with('error', 'Impossible de créer le film.');

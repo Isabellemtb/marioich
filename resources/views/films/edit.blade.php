@@ -50,6 +50,11 @@
                    value="{{ old('rating', $film['rating']) }}">
         </div>
 
+        <!-- Champs cachés obligatoires pour l'API -->
+        <input type="hidden" name="rental_duration" value="{{ $film['rentalDuration'] ?? 3 }}">
+        <input type="hidden" name="rental_rate" value="{{ $film['rentalRate'] ?? 4.99 }}">
+        <input type="hidden" name="replacement_cost" value="{{ $film['replacementCost'] ?? 19.99 }}">
+
         <!-- Boutons -->
         <button type="submit" class="btn btn-primary">Mettre à jour</button>
         <a href="{{ route('films.show', $film['filmId'] ?? $film['id']) }}" class="btn btn-secondary">Annuler</a>

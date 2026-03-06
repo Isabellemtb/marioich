@@ -59,7 +59,17 @@ class ToadFilmService
                 ->get($url);
 
             if ($response->successful()) {
-                return $response->json();
+                $film = $response->json();
+
+                // Récupérer le nom du langage si un ID est présent
+                if (isset($film['originalLanguageId'])) {
+                    $language = $this->getLanguageById($film['originalLanguageId']);
+                    if ($language && isset($language['name'])) {
+                        $film['languageName'] = $language['name'];
+                    }
+                }
+
+                return $film;
             }
 
             return null;
@@ -67,6 +77,29 @@ class ToadFilmService
             Log::error('Erreur API Film', ['msg' => $e->getMessage()]);
             return null;
         }
+    }
+
+    /**
+     * Récupère le nom d'un langage par son ID
+     * Utilise un mapping local car l'API /languages/{id} retourne 403
+     */
+    private function getLanguageById(int $id): ?array
+    {
+        // Mapping des langages 
+        $languages = [
+            1 => 'English',
+            2 => 'Italian',
+            3 => 'Japanese',
+            4 => 'Mandarin',
+            5 => 'French',
+            6 => 'German',
+        ];
+
+        if (isset($languages[$id])) {
+            return ['name' => $languages[$id]];
+        }
+
+        return null;
     }
 
     /**
@@ -165,6 +198,7 @@ class ToadFilmService
                 return true;
             }
 
+            Log::warning('Suppression film KO', ['status' => $response->status(), 'body' => $response->body()]);
             return false;
         } catch (\Throwable $e) {
             Log::error('Erreur suppression film', ['msg' => $e->getMessage()]);

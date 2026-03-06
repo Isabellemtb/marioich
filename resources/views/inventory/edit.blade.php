@@ -82,6 +82,62 @@
 
                     <hr class="my-4">
 
+                    <h6 class="fw-bold mb-3">Transférer vers un autre store</h6>
+                    <form action="{{ route('inventory.transfer', [$storeId, $filmId]) }}" method="POST" class="mb-4">
+                        @csrf
+
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i>
+                            Vous avez <strong>{{ $availableCount }}</strong> DVD(s) disponible(s) pour ce film. Seuls les DVD disponibles (non loués) peuvent être transférés.
+                        </div>
+
+                        @if($availableCount > 0)
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="target_store_id" class="form-label">Store de destination</label>
+                                    <select class="form-select @error('target_store_id') is-invalid @enderror"
+                                            id="target_store_id"
+                                            name="target_store_id"
+                                            required>
+                                        <option value="">Sélectionnez un store...</option>
+                                        @foreach($allStores as $store)
+                                            <option value="{{ $store }}">Store {{ $store }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('target_store_id')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="transfer_quantity" class="form-label">Quantité à transférer</label>
+                                    <input type="number"
+                                           class="form-control @error('quantity') is-invalid @enderror"
+                                           id="transfer_quantity"
+                                           name="quantity"
+                                           min="1"
+                                           max="{{ $availableCount }}"
+                                           value="1"
+                                           required>
+                                    @error('quantity')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-warning" onclick="return confirm('Êtes-vous sûr de vouloir transférer ces DVD ?');">
+                                <i class="bi bi-arrow-left-right"></i> Transférer
+                            </button>
+                        @else
+                            <div class="alert alert-warning">
+                                <i class="bi bi-exclamation-triangle"></i>
+                                Aucun DVD disponible pour le transfert. Tous les DVD sont actuellement loués.
+                            </div>
+                        @endif
+                    </form>
+
+                    <hr class="my-4">
+
                     <h6 class="fw-bold mb-3">Gestion des exemplaires individuels</h6>
                     <div class="table-responsive">
                         <table class="table table-bordered">

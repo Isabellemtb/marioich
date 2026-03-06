@@ -21,7 +21,7 @@
                                 <thead class="table-dark">
                                     <tr>
                                         <th>Nom</th>
-                                        <th>Adresse</th>
+                                        <th>Nombre d'exemplaires</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -31,8 +31,8 @@
                                             <td><strong>Store {{ $store['store_id'] }}</strong></td>
                                             <td>{{ $store['count'] }} DVD(s) en stock</td>
                                             <td>
-                                                <a href="{{ route('inventory.show', $store['store_id']) }}" class="btn btn-primary rounded-circle" style="width: 40px; height: 40px;">
-                                                    <i class="bi bi-eye"></i>
+                                                <a href="{{ route('inventory.show', $store['store_id']) }}" class="btn btn-primary btn-sm">
+                                                    <i class="bi bi-eye"></i> Voir
                                                 </a>
                                             </td>
                                         </tr>
