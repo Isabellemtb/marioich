@@ -58,18 +58,24 @@
                                                         class="btn btn-sm btn-warning" title="Modifier">
                                                         <i class="bi bi-pencil"></i>
                                                     </a>
-                                                    <form action="{{ route('films.destroy', $film['filmId'] ?? $film['id']) }}"
-                                                          method="POST"
-                                                          style="display: inline;"
-                                                          onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce film ?');">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit"
-                                                                class="btn btn-sm btn-danger"
-                                                                title="Supprimer">
+                                                    @if(isset($filmsWithActiveRentals[$film['filmId'] ?? $film['id']]))
+                                                        <button type="button" class="btn btn-sm btn-danger disabled" title="Impossible de supprimer : ce film a des locations en cours" disabled>
                                                             <i class="bi bi-trash"></i>
                                                         </button>
-                                                    </form>
+                                                    @else
+                                                        <form action="{{ route('films.destroy', $film['filmId'] ?? $film['id']) }}"
+                                                              method="POST"
+                                                              style="display: inline;"
+                                                              onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce film ?');">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit"
+                                                                    class="btn btn-sm btn-danger"
+                                                                    title="Supprimer">
+                                                                <i class="bi bi-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    @endif
                                                 </div>
                                             </td>
                                         </tr>

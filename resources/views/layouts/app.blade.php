@@ -49,6 +49,16 @@
                                     Gestion du stock
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->routeIs('rental.*') ? 'active' : '' }}" href="{{ route('rental.index') }}">
+                                    Gestion des locations
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->routeIs('customer.*') ? 'active' : '' }}" href="{{ route('customer.index') }}">
+                                    Gestion des utilisateurs
+                                </a>
+                            </li>
                         @endauth
                     </ul>
 

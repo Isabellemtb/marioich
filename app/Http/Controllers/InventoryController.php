@@ -52,21 +52,30 @@ class InventoryController extends Controller
         // Récupère les inventaires pour ce store
         $inventories = $this->inventoryService->getInventoriesByStore($storeId);
 
-        // Transforme pour la vue
-        $dvds = [];
+        // Groupe par film et compte les exemplaires
+        $groupedDvds = [];
+        $totalDvds = 0;
         if ($inventories) {
             foreach ($inventories as $inventory) {
-                $dvds[] = [
-                    'inventory_id' => $inventory['inventoryId'] ?? null,
-                    'film_title' => $inventory['film']['title'] ?? 'N/A',
-                    'film_id' => $inventory['filmId'] ?? null,
-                ];
+                $filmId = $inventory['filmId'] ?? null;
+                if ($filmId) {
+                    if (!isset($groupedDvds[$filmId])) {
+                        $groupedDvds[$filmId] = [
+                            'film_id'    => $filmId,
+                            'film_title' => $inventory['film']['title'] ?? 'N/A',
+                            'count'      => 0,
+                        ];
+                    }
+                    $groupedDvds[$filmId]['count']++;
+                    $totalDvds++;
+                }
             }
         }
 
         return view('inventory.show', [
-            'storeId' => $storeId,
-            'dvds' => $dvds
+            'storeId'     => $storeId,
+            'groupedDvds' => array_values($groupedDvds),
+            'totalDvds'   => $totalDvds,
         ]);
     }
 

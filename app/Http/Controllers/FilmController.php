@@ -3,24 +3,36 @@
 namespace App\Http\Controllers;
 
 use App\Services\ToadFilmService;
+use App\Services\ToadRentalService;
 use Illuminate\Http\Request;
 
 class FilmController extends Controller
 {
     private ToadFilmService $filmService;
+    private ToadRentalService $rentalService;
 
-    public function __construct(ToadFilmService $filmService)
+    public function __construct(ToadFilmService $filmService, ToadRentalService $rentalService)
     {
         $this->middleware('auth');
         $this->filmService = $filmService;
+        $this->rentalService = $rentalService;
     }
 
     public function index()
     {
         $films = $this->filmService->getAllFilms();
 
+        $allRentals = $this->rentalService->getAllRentals() ?? [];
+        $filmsWithActiveRentals = array_flip(array_unique(
+            array_filter(array_map(
+                fn($r) => ($r['statusId'] ?? 0) === 3 ? ($r['inventory']['filmId'] ?? null) : null,
+                $allRentals
+            ), fn($id) => $id !== null)
+        ));
+
         return view('films.index', [
-            'films' => $films ?? []
+            'films' => $films ?? [],
+            'filmsWithActiveRentals' => $filmsWithActiveRentals,
         ]);
     }
 

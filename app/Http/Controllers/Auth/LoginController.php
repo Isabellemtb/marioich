@@ -43,13 +43,14 @@ class LoginController extends Controller
         $staff = $resp['staff'] ?? $resp;
 
         $userData = [
-            'id'        => $staff['staffId'] ?? $staff['id'] ?? $staff['email'],
-            'email'     => $staff['email'] ?? null,
-            'name'      => $staff['name']
-                           ?? trim(($staff['first_name'] ?? '').' '.($staff['last_name'] ?? ''))
-                           ?: ($staff['email'] ?? 'Utilisateur'),
-            'token'     => $resp['token'] ?? $resp['access_token'] ?? null, // token JWT Toad si renvoyé
-            'staff'     => $staff, // on garde toutes les infos utiles
+            'id'             => $staff['staffId'] ?? $staff['id'] ?? $staff['email'],
+            'email'          => $staff['email'] ?? null,
+            'name'           => $staff['name']
+                                ?? trim(($staff['first_name'] ?? '').' '.($staff['last_name'] ?? ''))
+                                ?: ($staff['email'] ?? 'Utilisateur'),
+            'token'          => $resp['token'] ?? $resp['access_token'] ?? null,
+            'staff'          => $staff,
+            'remember_token' => '',
         ];
 
         // Enregistrer l’utilisateur en session
@@ -60,6 +61,16 @@ class LoginController extends Controller
         Auth::login($user, false); // éviter remember me (non supporté par ce provider)
 
         return $this->sendLoginResponse($request);
+    }
+
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        $request->session()->forget('toad_user');
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('login');
     }
 
     protected function validateLogin(Request $request)
