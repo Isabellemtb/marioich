@@ -82,7 +82,6 @@ class CustomerController extends Controller
             'storeId'    => (int) $request->input('storeId'),
             'addressId'  => (int) $request->input('addressId'),
             'createDate' => $request->input('createDate'),
-            'password'   => $request->input('password'),
         ];
         $success = $this->customerService->updateCustomer($id, $data);
         $message = $success ? 'Client modifié avec succès.' : 'Erreur lors de la modification.';

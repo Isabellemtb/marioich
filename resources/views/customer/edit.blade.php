@@ -12,7 +12,6 @@
         <input type="hidden" name="storeId" value="{{ $customer['storeId'] }}">
         <input type="hidden" name="addressId" value="{{ $customer['addressId'] }}">
         <input type="hidden" name="createDate" value="{{ $customer['createDate'] }}">
-        <input type="hidden" name="password" value="{{ $customer['password'] }}">
 
         <div class="mb-3">
             <label for="lastName" class="form-label">Nom</label>

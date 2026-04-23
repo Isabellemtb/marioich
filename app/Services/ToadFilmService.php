@@ -79,14 +79,9 @@ class ToadFilmService
         }
     }
 
-    /**
-     * Récupère le nom d'un langage par son ID
-     * Utilise un mapping local car l'API /languages/{id} retourne 403
-     */
-    private function getLanguageById(int $id): ?array
+    public function getLanguages(): array
     {
-        // Mapping des langages 
-        $languages = [
+        return [
             1 => 'English',
             2 => 'Italian',
             3 => 'Japanese',
@@ -94,12 +89,12 @@ class ToadFilmService
             5 => 'French',
             6 => 'German',
         ];
+    }
 
-        if (isset($languages[$id])) {
-            return ['name' => $languages[$id]];
-        }
-
-        return null;
+    private function getLanguageById(int $id): ?array
+    {
+        $languages = $this->getLanguages();
+        return isset($languages[$id]) ? ['name' => $languages[$id]] : null;
     }
 
     /**

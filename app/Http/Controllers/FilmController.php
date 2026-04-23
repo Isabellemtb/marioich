@@ -62,9 +62,8 @@ class FilmController extends Controller
         }
 
     // Retourne la vue avec les données du film
-        return view('films.edit', [
-        'film' => $film
-        ]);
+        $languages = $this->filmService->getLanguages();
+        return view('films.edit', compact('film', 'languages'));
     }
 
 /**
