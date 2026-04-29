@@ -146,7 +146,8 @@ public function store(Request $request)
  */
 public function create()
     {
-    return view('films.create'); 
+        $languages = $this->filmService->getLanguages();
+        return view('films.create', compact('languages'));
     }
 public function destroy($id)
 {

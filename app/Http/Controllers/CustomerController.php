@@ -18,7 +18,7 @@ class CustomerController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * Affiche la liste des clients
      */
     public function index()
     {
@@ -36,7 +36,7 @@ class CustomerController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Affiche le formulaire de création d'un client
      */
     public function create()
     {
@@ -44,7 +44,7 @@ class CustomerController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Enregistre un nouveau client en base
      */
     public function store(Request $request)
     {
@@ -52,7 +52,7 @@ class CustomerController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Affiche les détails d’un client
      */
     public function show(string $id)
     {
@@ -60,7 +60,7 @@ class CustomerController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Affiche le formulaire d’édition d’un client
      */
     public function edit(string $id)
     {
@@ -69,7 +69,7 @@ class CustomerController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Met à jour un client existant
      */
     public function update(Request $request, string $id)
     {
@@ -89,7 +89,7 @@ class CustomerController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Supprime un client
      */
     public function destroy(string $id)
     {

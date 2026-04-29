@@ -21,9 +21,15 @@
 
         <!-- Langue -->
         <div class="mb-3">
-            <label for="language_id" class="form-label">ID Langue</label>
-            <input type="number" class="form-control" id="language_id" name="language_id"
-                   value="{{ old('language_id') }}">
+            <label for="language_id" class="form-label">Langue</label>
+            <select class="form-control" id="language_id" name="language_id">
+                <option value="">-- Aucune --</option>
+                @foreach ($languages as $id => $name)
+                    <option value="{{ $id }}" {{ old('language_id') == $id ? 'selected' : '' }}>
+                        {{ $name }}
+                    </option>
+                @endforeach
+            </select>
         </div>
 
 
